@@ -12,7 +12,7 @@ def findAlphabeticallyLastWord(text):
     You might find max() and list comprehensions handy here.
     """
     # BEGIN_YOUR_CODE (our solution is 1 line of code, but don't worry if you deviate from this)
-    raise Exception("Not implemented yet")
+    return (max(text.casefold().split()))
     # END_YOUR_CODE
 
 ############################################################
@@ -24,7 +24,12 @@ def euclideanDistance(loc1, loc2):
     are pairs of numbers (e.g., (3, 5)).
     """
     # BEGIN_YOUR_CODE (our solution is 1 line of code, but don't worry if you deviate from this)
-    raise Exception("Not implemented yet")
+    from math import sqrt 
+    ydiff = loc1[1] - loc2[1]
+    xdiff = loc1[0] - loc2[0]
+    ysquare = ydiff**2
+    xsquare = xdiff**2
+    return(sqrt(ysquare + xsquare))
     # END_YOUR_CODE
 
 ############################################################
@@ -35,7 +40,7 @@ def mutateSentences(sentence):
     Given a sentence (sequence of words), return a list of all "similar"
     sentences.
     We define a sentence to be similar to the original sentence if
-      - it as the same number of words, and
+      - it has the same number of words, and
       - each pair of adjacent words in the new sentence also occurs in the original sentence
         (the words within each pair should appear in the same order in the output sentence
          as they did in the original sentence.)
