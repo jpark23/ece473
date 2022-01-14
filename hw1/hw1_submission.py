@@ -34,6 +34,19 @@ def euclideanDistance(loc1, loc2):
 
 ############################################################
 # Problem 3c
+def find_similars_helper(similars, word_dict, current_word, word_count, current_word_count):
+#     print(str(current_word)+" "+str(current_word_count))
+    nexts = word_dict.get(current_word, 0)
+    if (current_word_count == word_count):
+        similars.append(current_word)
+        return 
+    if not nexts:
+        similars.append(current_word)
+        return 
+    for next_word in nexts:
+        word = find_similars_helper(similars, word_dict, next_word, word_count, current_word_count + 1)
+        similars.append(current_word)
+        return
 
 def mutateSentences(sentence):
     """
@@ -55,7 +68,33 @@ def mutateSentences(sentence):
                 (reordered versions of this list are allowed)
     """
     # BEGIN_YOUR_CODE (our solution is 21 lines of code, but don't worry if you deviate from this)
-    raise Exception("Not implemented yet")
+    # build the next word dictionary
+    word_dict = {}
+    words = sentence.split()
+    index = 0
+    while(index < len(words)-1):
+        test_entry = words[index]
+        if(test_entry not in word_dict):
+            new_value = list()
+            new_value.append(words[index + 1])
+            word_dict[test_entry] = new_value
+        else:
+            word_dict[test_entry].append(words[index+1]) 
+        index += 1
+    word_dict[words[len(words)-1]] = []
+    # getting word count
+    word_count = len(words)
+    # starting recursion
+    similar_sentences = list()
+    similar_sentences.append(sentence)
+    for key in word_dict:
+        similars = list()
+        find_similars_helper(similars, word_dict, key, word_count, 1)
+        similars.reverse()
+        similar_sentence = ' '.join(map(str, similars))
+        if(len(similars) == 5):
+            similar_sentences.append(similar_sentence)
+    return similar_sentences
     # END_YOUR_CODE
 
 ############################################################

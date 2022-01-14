@@ -30,7 +30,4 @@ def main_3c():
     #     sentence = find_sentences(word_dict, key, 5)
     sentence = find_sentences(word_dict, "and", 5)
 
-def main():
-    
-
-main()
+main_3c()
