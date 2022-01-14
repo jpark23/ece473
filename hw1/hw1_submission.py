@@ -69,7 +69,24 @@ def sparseVectorDotProduct(v1, v2):
     This function will be useful later for linear classifiers.
     """
     # BEGIN_YOUR_CODE (our solution is 1 line of code, but don't worry if you deviate from this)
-    raise Exception("Not implemented yet")
+    v1_values = list()
+    v2_values = list()
+    vector_size = max(len(v1.keys()), len(v2.keys()))
+    for value in v1.values():
+        v1_values.append(value)
+    for value in v2.values():
+        v2_values.append(value)
+    v2_values.reverse()
+    while(len(v1_values) != vector_size):
+        v1_values.append(0)
+    while(len(v2_values) != vector_size):
+        v2_values.append(0)
+    index = 0
+    sum = 0
+    while(index < vector_size):
+        sum += v1_values[index] * v2_values[index]
+        index += 1
+    return sum
     # END_YOUR_CODE
 
 ############################################################
