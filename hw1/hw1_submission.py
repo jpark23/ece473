@@ -98,7 +98,8 @@ def incrementSparseVector(v1, scale, v2):
     This function will be useful later for linear classifiers.
     """
     # BEGIN_YOUR_CODE (our solution is 2 lines of code, but don't worry if you deviate from this)
-    raise Exception("Not implemented yet")
+    for key in v2:
+        v1[key] += scale * v2[key]
     # END_YOUR_CODE
 
 ############################################################
@@ -111,7 +112,15 @@ def findSingletonWords(text):
     You might find it useful to use collections.defaultdict(int).
     """
     # BEGIN_YOUR_CODE (our solution is 4 lines of code, but don't worry if you deviate from this)
-    raise Exception("Not implemented yet")
+    words = text.split()
+    occurences = collections.defaultdict(int)
+    for word in words:
+        occurences[word] += 1
+    singletons = set()
+    for word in occurences:
+        if(occurences[word] == 1):
+            singletons.add(word)
+    return(singletons)
     # END_YOUR_CODE
 
 ############################################################
