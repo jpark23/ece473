@@ -1,0 +1,2194 @@
+0:01
+in this lecture we consider
+0:03
+ai problems where
+0:05
+we are modeling the effects of choices
+0:07
+we make
+0:09
+with a longer term idea of what we're
+0:11
+trying to achieve we will call it goal
+0:14
+so
+0:15
+unlike the say machine learning
+0:17
+classification problem where we have an
+0:19
+input
+0:20
+and we we need to make a choice
+0:24
+but that choice is simply right or wrong
+0:27
+or maybe we'll assign probabilities but
+0:29
+we want to assign the high probability
+0:30
+to the right answer there's a sort of
+0:32
+right answer that's defined in the
+0:34
+training
+0:36
+in these problems while we do have the
+0:38
+problem of making a choice
+0:40
+there's a couple absolutely critical
+0:42
+differences uh
+0:44
+most centrally
+0:46
+we don't have a label as to which of
+0:48
+these choices is right we have a goal
+0:50
+and the goal is not achieved by one of
+0:52
+these choices
+0:53
+the goal is potentially achieved
+0:55
+downstream so the goal is not an
+0:57
+immediate thing
+0:59
+so they have this the goal is not an
+1:01
+immediate thing so unlike classification
+1:03
+or regression we don't have a label for
+1:05
+what this should be or if we work we can
+1:08
+come up with a design that gives us a
+1:10
+label but that extra work is is the
+1:12
+topic here
+1:13
+how do we convert this problem into a
+1:15
+classification problem is something you
+1:16
+could ask
+1:18
+it's not on the face of it a
+1:19
+classification problem because the
+1:21
+specification of what we're trying to
+1:22
+achieve is not a label on these out of
+1:25
+these choices
+1:26
+okay well we do imagine we might have
+1:28
+the input
+1:29
+which is this and this is like the
+1:31
+current state of the world or the
+1:33
+problem
+1:34
+and we're going to take that and we want
+1:36
+to
+1:37
+choose between what well the the problem
+1:40
+has to give us the choices as well
+1:42
+and you can think of those as labels
+1:43
+that we want to assign
+1:45
+um
+1:47
+but we're not going to
+1:48
+be able to assign them by learning from
+1:50
+a training data set because we have no
+1:51
+such thing and um
+1:53
+what we have instead is a goal
+1:55
+downstream goal
+1:57
+so there's a couple other critical
+1:58
+features here one of which
+2:00
+is
+2:02
+ever present in ai and that is that this
+2:04
+thing we're labeling
+2:06
+the thing we're going to try to choose
+2:08
+one of the options from
+2:11
+is
+2:12
+typically highly structured
+2:15
+a complex object like a relational
+2:16
+database
+2:18
+a description of
+2:20
+this current state of some problem even
+2:22
+if the problem say you can't imagine the
+2:24
+problem of solving a rubik's cube
+2:26
+this is the description of the current
+2:27
+state of the cube where every little qb
+2:30
+is
+2:31
+um
+2:32
+there's an astronomical number of
+2:34
+possible states even just of the rubik's
+2:36
+cube and that's a pretty restricted ai
+2:38
+problem
+2:39
+so we're going to have complex
+2:41
+structured state
+2:42
+and a space of states that's absolutely
+2:44
+enormous so that's what's going to
+2:46
+differentiate this from a graph
+2:48
+theoretic problem in algorithms where we
+2:50
+want to find
+2:51
+the shortest path from here to a goal
+2:54
+and that's
+2:55
+we actually have a graph theoretic
+2:56
+problem but this element is makes it
+2:59
+very different in character
+3:02
+and
+3:03
+lastly
+3:04
+in today's discussion we're going to be
+3:06
+assuming i put question marks here
+3:08
+because we're going to relax this
+3:10
+downstream
+3:12
+but
+3:12
+traditional ai first studied the problem
+3:15
+of
+3:17
+making choices where you know the
+3:18
+results of the choices and they're
+3:19
+deterministic so if we turn the top of
+3:22
+the rubik's cube clockwise we know the
+3:24
+new state that we're going to get
+3:27
+that's not typically true
+3:30
+in many say robotics problems or agent
+3:32
+in the world problems many ai problems
+3:35
+that are important to us we actually
+3:37
+have a lot of noise and uncertainty in
+3:41
+interactions another thing not listed
+3:43
+here but that we're going to be assuming
+3:44
+is full observability that we know the
+3:47
+actual current state it's not like the
+3:49
+back of the rubik's cube is hidden and
+3:51
+we're not sure what what's on there that
+3:52
+would be an interesting problem in its
+3:54
+own right rubik's cube with partial
+3:56
+visibility but that's not the kind of
+3:57
+problem we're talking about here we have
+3:59
+full observability
+4:02
+so i've added that note
+4:05
+so
+4:06
+in this setting
+4:08
+the effect of our action is to get a new
+4:10
+problem of a similar form without any
+4:12
+notion yet of whether we did the right
+4:13
+thing or not
+4:15
+so it kind of looks like this or we get
+4:18
+a new problem looks the same we have to
+4:20
+decide what to do or a new problem here
+4:21
+or a new problem here and we we don't
+4:24
+know whether we did the right thing here
+4:26
+until we know what's right to do in at
+4:27
+least one of these um and this
+4:30
+is an ever-growing and exponentially
+4:32
+growing and large
+4:33
+structure that somewhere downstream
+4:35
+there's a goal we're trying to reach the
+4:37
+goal could be one of these states or it
+4:38
+could be a predicate you apply to the
+4:40
+state and says yes we like this one
+4:42
+and so there could be a lot of different
+4:44
+states that satisfy the goal we're
+4:45
+trying to reach one of them
+4:47
+we could also have costs
+4:49
+on these edges some of these action
+4:50
+choices we call these action choices we
+4:52
+call this a successor state
+4:55
+i'll put a note to that here
+4:59
+so that's some of the terminology
+5:02
+typically the idea is we're going to
+5:03
+explore some part of this graph that's
+5:05
+developing here in order to find the
+5:08
+best or at least a path to a goal and
+5:10
+that's the kind of method we'll be
+5:12
+talking about
+5:13
+in this part of the course
+5:16
+so this leads us to a problem
+5:18
+formulation
+5:20
+and sort of a classic ai problem
+5:21
+formulation
+5:23
+where we're going to have
+5:26
+some
+5:27
+notion of possible states these are
+5:30
+possible states of we might say the
+5:31
+world or some problem
+5:34
+and one particular possible state will
+5:37
+be the current state or the initial
+5:38
+state of our problem solving
+5:42
+and from each of the states in the whole
+5:45
+in the whole possible universe of states
+5:48
+there are available action choices and
+5:50
+the model must specify
+5:52
+there must be a function that you can
+5:54
+call
+5:55
+pass it to
+5:56
+any one of these states and it will tell
+5:58
+you what the available action choices
+6:00
+are and you must be able to use those in
+6:02
+the model to figure out what the next
+6:04
+state will be if you take that action
+6:06
+so this might be a1 a2 and a3 three
+6:09
+actions that are available if it's a
+6:11
+rubik's cube these might be the six
+6:14
+sides of the cube
+6:16
+and each one can be turned in perhaps in
+6:18
+either direction you might have 12
+6:20
+available actions
+6:26
+also associated with the actions are
+6:28
+costs they don't always have to be
+6:30
+uniform there could be difference costs
+6:32
+c1 c2 and c3 for the different actions
+6:36
+of note here as i've mentioned is that
+6:38
+we're currently imagining that our
+6:40
+actions deterministically produce next
+6:42
+states and these will be states of the
+6:44
+same form
+6:46
+as the state we were in but you know
+6:48
+some some differences between them but
+6:49
+the same
+6:50
+structure
+6:55
+so
+6:56
+expanding that out imagine that we
+6:58
+repeated those uh evaluations at this
+7:01
+state and so forth we get a universe of
+7:04
+reachable states that we might reach
+7:06
+somewhere within that universe are some
+7:07
+states we would like to reach
+7:09
+and so our challenge is to find a
+7:12
+sequence of actions that we can apply to
+7:13
+this state
+7:15
+the state we're currently in to reach
+7:17
+any one of the gold states
+7:19
+rather have a list of gold states we
+7:21
+have a predicate that
+7:23
+we can apply to states that says yes or
+7:24
+no it is a goal state
+7:27
+we may have some information about what
+7:30
+qualifies as a goal state that we can
+7:31
+use to try to
+7:33
+make our choices to reachable state
+7:35
+that's the goal is for me to have coffee
+7:38
+i might use that information with
+7:40
+knowledge about how the actions work to
+7:42
+get to such a state
+7:46
+so
+7:48
+what you can notice is that this is a
+7:51
+graph
+7:52
+if we were to build if we were to
+7:54
+explore all the possible states we could
+7:56
+build a graph where the nodes of the
+7:58
+graph are these boxes and some of the
+8:00
+nodes are goal states one of them is our
+8:02
+current state and we have costs on the
+8:05
+edges and we want
+8:07
+a path from the current state to a goal
+8:09
+perhaps we want the lowest cost path and
+8:12
+we could apply our graph algorithms
+8:14
+so there are graph algorithms we will
+8:17
+do a little brief coverage of
+8:19
+that you would learn in an algorithms
+8:21
+class and you'll be learning somewhat
+8:23
+here
+8:26
+that can find uh the a path or the
+8:29
+shortest path within a graph but
+8:31
+and those algorithms are efficient
+8:34
+polynomial time in the size of the graph
+8:38
+our problem is that our graph
+8:40
+in ai problems is never
+8:42
+a reasonable size virtually never so
+8:46
+the graph itself is exponential or worse
+8:49
+in size relative to the normal notion of
+8:51
+problem description i can describe a
+8:54
+rubik's cube to you
+8:56
+but the number of possible states of a
+8:58
+rubik's cube is astronomical and so the
+9:00
+graph of all of its states with the
+9:02
+edges being single terms of the sides is
+9:05
+way way too large that you put the whole
+9:07
+thing in memory
+9:09
+and even worse for say chess
+9:12
+chess
+9:13
+is a problem with an opponent
+9:16
+so
+9:16
+that doesn't quite fit into this
+9:18
+paradigm although you can begin to see
+9:21
+that we could put it into this paradigm
+9:23
+if we have two kinds of edges the edges
+9:24
+where we choose and the edges where
+9:25
+someone else chooses
+9:29
+all right so the ai feature here is that
+9:31
+this graph is going to be way too large
+9:32
+to fit in memory so our standard
+9:34
+algorithms algorithms are no longer
+9:36
+considered tractable
+9:39
+they're tractable and relative to the
+9:41
+size of the graph but not relative to
+9:42
+the size of the problem description
+9:44
+which is so compact that it describes an
+9:46
+astronomical graph in a short
+9:48
+description i give you the rules of jess
+9:50
+and now you have all the positions of
+9:52
+chess in a graph
+9:54
+okay so that's the nature of
+9:57
+um ai search and it's relation to graph
+10:01
+algorithms
+10:05
+so it will help some of our
+10:07
+methods
+10:08
+if we
+10:12
+keep in mind that we can track some data
+10:14
+as we encounter these nodes or states in
+10:17
+our graph
+10:20
+two things that we'll refer to are first
+10:22
+of all when we encounter a state as
+10:24
+we're exploring
+10:27
+we're going to have a path that led to
+10:29
+that state because we're only going to
+10:31
+explore
+10:33
+from the
+10:34
+initial state that we're interested in
+10:36
+the current state or the source
+10:38
+and as we explore from there as we
+10:39
+encounter states we're going to have
+10:41
+a cost to reach them so say we have a
+10:43
+state s that we're
+10:45
+exploring
+10:47
+and we find
+10:48
+there'll be some path from the start
+10:50
+start state to the state s that we
+10:52
+arrived there on and there will be a
+10:54
+total cost of that path and we will call
+10:56
+that g
+10:57
+g of s
+10:59
+function g maps s
+11:01
+to the best cost we can achieve from the
+11:04
+start state or if we're thinking of it
+11:06
+as a data structure in the in a program
+11:07
+it's the best cost we've seen from the
+11:09
+start state
+11:10
+so far that is the sum of the costs
+11:13
+along whatever path led there
+11:15
+among all the paths we've seen to s so
+11:17
+far the best of those sums
+11:21
+if we explore in the right order we will
+11:23
+ensure that the best path we've seen so
+11:25
+far is in fact the best path from the
+11:28
+source to s and then g of s will
+11:30
+actually be the cost along the best path
+11:34
+and likewise when we're configuring out
+11:36
+g of s
+11:38
+for for some arbitrary s
+11:40
+we'll have the path that led there at
+11:42
+that cost and that path will have an
+11:44
+immediate predecessor and parent of s
+11:47
+will be that predecessor so
+11:49
+there'll be some
+11:51
+predecessor that led there along the
+11:53
+best path and the parent of s
+11:56
+will be this red pointer
+12:00
+so by following the red pointers back we
+12:02
+can get back to the start state
+12:04
+along the best path we've seen so far so
+12:06
+that's some data structuring that we
+12:08
+will do and also mathematically a term
+12:10
+will use this g of s as a mathematical
+12:12
+function on the state that gives the
+12:15
+cost to reach it from the start state
+12:17
+along the best path
+12:21
+so our fundamental problem is that this
+12:23
+graph
+12:24
+doesn't fit in our memory or even
+12:26
+remotely
+12:28
+so this is the fundamental problem we
+12:29
+have to deal with in ai now this graph
+12:31
+may fit in memory for many practical
+12:32
+problems
+12:34
+but those are typically not ai problems
+12:39
+the graphical footage memory but
+12:41
+even relatively toy ai problems like the
+12:44
+rubik's cube the graph of all the
+12:46
+possible rubik's cube states does not
+12:48
+fit in memory and we don't have time to
+12:49
+look at all the states
+12:51
+so we have to solve this problem when we
+12:55
+have some general grab bag of techniques
+12:57
+that help with this problem there's no
+12:59
+final
+13:00
+answer to how we would solve this
+13:01
+problem
+13:02
+but the general obvious thing is we're
+13:04
+going to explore the graph
+13:06
+from the source like we're at some
+13:09
+current state of the rubik's cube or
+13:10
+some current state of the world and we
+13:12
+can think about where we can reach
+13:14
+in small numbers of steps and we can
+13:16
+keep only that part of the graph that we
+13:18
+have explored we don't have to put the
+13:19
+whole thing in
+13:21
+and some of the key algorithms that
+13:23
+we're going to talk about that
+13:26
+use this are
+13:28
+breadth first search and uniform cost
+13:29
+search
+13:31
+we're also going to enrich those
+13:33
+using the second idea
+13:35
+into various forms of heuristic search
+13:37
+called best first search and a star
+13:41
+those techniques
+13:44
+use in addition to what we've talked
+13:45
+about they use an estimate
+13:48
+of what's promising
+13:50
+so we'll talk about
+13:52
+um
+13:54
+talk about that in more detail but the
+13:55
+basic idea is that by looking at the
+13:58
+definition of the goal and
+14:01
+the properties in the structure of the
+14:03
+current state we might be able to get an
+14:04
+estimate of whether it's a promising
+14:06
+state or not
+14:10
+if we can quantify that estimate we can
+14:12
+use it in our search
+14:14
+as we will see
+14:16
+a final idea that can be quite important
+14:18
+is a space-time trade-off
+14:20
+that even keeping this
+14:23
+part we've explored in memory can be too
+14:25
+expensive and what we can do is just go
+14:28
+ahead and forget it and repeat the
+14:30
+exploration with more and more
+14:32
+aggressive
+14:33
+parameters so we're going deeper and
+14:34
+deeper into the graph but we're not
+14:36
+remembering everything we did we're
+14:38
+redoing it and this is a technique
+14:40
+called iterative deepening and it plays
+14:42
+off of the efficiency
+14:45
+of
+14:46
+a
+14:47
+general graph algorithm called depth
+14:49
+first search
+14:56
+so iterative deepening is using depth
+14:59
+first search
+15:01
+uh to explore from the root
+15:04
+deeper and deeper and deeper where the
+15:06
+cutoff of the depth is used from these
+15:08
+ideas up here
+15:09
+so we're only exploring part of the
+15:10
+graph according to these ideas up here
+15:13
+but the part we're exploring is being
+15:15
+explored depth first so we don't need
+15:17
+all the memory to remember
+15:20
+once we've defined these ideas we can
+15:23
+look at how depth first search can be
+15:24
+used to implement them
+15:31
+so we're ready to start sketching a
+15:34
+general purpose
+15:36
+framework of an algorithm that will be
+15:38
+able to accommodate all of these ideas
+15:42
+so
+15:43
+for starters for our general method
+15:46
+we're going to
+15:48
+remember every state that we've
+15:51
+considered
+15:52
+every state that's come into our
+15:54
+consideration will remember them unless
+15:56
+we're doing the iterative deepening
+15:58
+um
+15:58
+and as we
+16:01
+um encounter them we'll keep track of
+16:04
+the g value that is the cost of the
+16:07
+path to get there and we'll also keep
+16:10
+track of the predecessor remember what
+16:12
+state led to the state so if this is our
+16:14
+source
+16:16
+and we've seen two different paths to
+16:18
+this state here
+16:20
+we'll remember the predecessor that led
+16:23
+to the better cost
+16:25
+and you can figure out what that is
+16:26
+because each of these
+16:28
+states will have g values and we can add
+16:30
+the costs along these edges and see what
+16:32
+the g value would be here on each path
+16:35
+choose the better one and point the
+16:37
+parent pointer back
+16:39
+the way that's better now there's a
+16:41
+subtlety in here
+16:42
+and it's an important subtlety when
+16:44
+you're implementing
+16:45
+it's it's very difficult to keep all
+16:48
+these
+16:48
+subtleties and and caveats and
+16:50
+alternatives in mind all at once so
+16:52
+there's just a huge grab bag of search
+16:54
+algorithms that make these choices in
+16:56
+different ways and they often are
+16:58
+ambiguously named so when we say
+17:01
+best first search it's not always clear
+17:04
+which best first search we're talking
+17:05
+about what's the subtlety i'm referring
+17:07
+to here
+17:08
+well
+17:09
+i could not fail to notice that i've
+17:12
+reached this state two different paths i
+17:14
+might actually have this state in the
+17:16
+tree twice and not have detected it
+17:20
+in that which case it'll have two
+17:21
+different g values on it the one from
+17:23
+this path and one from this path and two
+17:24
+different parents
+17:26
+and so this is a subtlety whether this
+17:28
+grab bag of states that i'm keeping
+17:29
+track of with various functions
+17:33
+computable on them like g and parent
+17:36
+whether that grab bag is a hash table so
+17:37
+each state can be in there only once or
+17:39
+whether it's just
+17:41
+a table of states or you know
+17:44
+states occurring in my memory
+17:46
+lists and lists of states where the same
+17:49
+structure can be in there twice and it's
+17:51
+not clear which is better
+17:54
+so
+17:55
+uh obviously we'd like to know if we've
+17:57
+seen this one twice on two different
+17:59
+paths and just remember the better path
+18:00
+but there's a cost to doing that which
+18:02
+means we have to hash every state so we
+18:04
+can detect that it's being encountered
+18:06
+again
+18:07
+and so there's this overhead cost of
+18:09
+constantly checking if they've seen this
+18:10
+state before against all the other
+18:12
+states that we've seen
+18:14
+which one is which approach is better
+18:16
+depends on your application
+18:18
+so we're not necessarily assuming that
+18:20
+we detect this kind of thing this state
+18:22
+could there basically could be
+18:24
+duplicates in our tree
+18:27
+and that that can be acceptable
+18:31
+okay so either way though we're gonna
+18:34
+remember all the states we're
+18:35
+encountering possibly even with
+18:37
+duplicates and the route that led to
+18:38
+them and the costs along that route
+18:41
+that's all of our general methods are
+18:42
+going to do that
+18:45
+now once we've done that
+18:48
+we have this notion of expanding a state
+18:50
+now this is a key term in state space
+18:53
+search
+18:54
+a state is expanded when we look at what
+18:57
+we can do in one step from the state
+19:00
+what action choices are there and where
+19:02
+do they lead
+19:04
+and so when we expand the state
+19:06
+we add into consideration all the
+19:09
+possible next states from that state so
+19:11
+we're talking about in the first bullet
+19:14
+that we have the certain data
+19:15
+structuring around the states we're
+19:16
+considering
+19:17
+when we expand the state all of its next
+19:20
+states go into consideration so we never
+19:22
+need to expand that state again right
+19:24
+because
+19:25
+now all its next states are in
+19:27
+consideration they're in our data
+19:28
+structures we
+19:29
+expanding it again won't do anything
+19:34
+so the key process here is to keep
+19:36
+expanding the region of states that are
+19:38
+in consideration
+19:41
+by expanding individual states
+19:43
+once we've expanded them we don't worry
+19:44
+about them anymore we're not going to
+19:46
+expand them again so basically we're
+19:48
+most interested in
+19:49
+keeping track of the states we have not
+19:51
+expanded yet we've not looked at what
+19:53
+could happen
+19:54
+if we took an action in that state it's
+19:56
+the fringe of our
+19:58
+search
+20:00
+and so we take those states that have
+20:02
+not yet been expanded called the fringe
+20:05
+and keep them in some data structure
+20:08
+i call it a prioritized queue but the
+20:10
+priority need not be explicit it could
+20:12
+be a first in first out queue in which
+20:14
+case the priority is just age how long
+20:17
+have you been sitting in our data
+20:18
+structures under consideration
+20:21
+but you haven't been expanded
+20:22
+if you use a first and first out queue
+20:24
+you'll be doing breadth first search
+20:30
+more generally we can have a priority on
+20:31
+the queue and if that priority
+20:34
+within the queue is the g function
+20:36
+you'll be doing uniform cost search
+20:38
+which is another name for a very famous
+20:40
+algorithm called dijkstra's algorithm so
+20:43
+depending on what the priority is in the
+20:45
+queue you get these two different very
+20:47
+famous algorithms
+20:49
+also if we
+20:51
+use the priority in the queue that
+20:53
+combines the g function and a notion of
+20:56
+most promising
+20:57
+so we say it's both
+21:00
+a state that's easy to get to from the
+21:02
+source low g value and it's promising
+21:05
+with respect to being near the goal
+21:07
+if we add those two notions together and
+21:09
+use that as the priority we're going to
+21:10
+get a star which is perhaps the most
+21:12
+famous ai based search algorithm we will
+21:15
+review those in writing all three of
+21:17
+those
+21:18
+breadth first search uniform crossing a
+21:20
+star this is just foreshadowing
+21:23
+okay so our
+21:26
+general algorithm then within this
+21:28
+paradigm is this star here this is the
+21:32
+big
+21:34
+skeleton for all of our algorithms big
+21:36
+is being used as a term here for
+21:41
+impact the impact on on this lecture is
+21:44
+all in the side of this box is basically
+21:46
+the sketch of all the different
+21:48
+algorithms
+21:50
+so we just repeatedly
+21:53
+take the highest priority state that we
+21:55
+have not yet expanded but has gotten
+21:57
+into our consideration and expand it
+22:00
+and when we expand it new stuff comes
+22:02
+into consideration and joins our cue
+22:04
+and then we do repeat that we just keep
+22:06
+doing that until what until we get a
+22:08
+goal
+22:18
+of course
+22:23
+now if we
+22:24
+structure the notion of priority here
+22:28
+properly we will be sure we have the
+22:30
+shortest path to the goal at this point
+22:35
+we're not always worried about that
+22:44
+sometimes we're happy to find any path
+22:45
+to the goal and we might be a little
+22:47
+looser about how these priorities are
+22:48
+maintained
+22:53
+for instance the priority could just be
+22:55
+how close the state seems to the goal
+22:57
+even if it's actually
+22:59
+a long ways it has a high g value
+23:02
+so it's a long ways from the
+23:05
+source
+23:06
+it seems to be close to a goal so we'll
+23:08
+just keep expanding near the goal
+23:10
+um hoping to find a goal even though the
+23:14
+somewhere else in the fringe there might
+23:15
+be something that's
+23:17
+going to find a goal
+23:18
+closer to the source
+23:21
+um
+23:23
+that's
+23:24
+i think i'll diagram that um so we might
+23:27
+have our initial source and we might
+23:29
+have something
+23:31
+two options and these are both things
+23:33
+that are kind of close to the to the
+23:35
+source they're low cost to get to
+23:37
+from the source but this one seems
+23:39
+hotter maybe it seems closer to the goal
+23:41
+so we keep expanding it
+23:44
+and maybe we keep finding more states
+23:46
+that seem close to the goal
+23:48
+notice we're not finding the goal
+23:50
+eventually we might find a goal
+23:55
+this may not be the shortest path to the
+23:57
+goal if we just ignored the fact that we
+23:59
+were further and further away from the
+24:01
+source but kept expanding this because
+24:04
+it seemed close to the goal
+24:07
+that structure ignores the possibility
+24:10
+that even though this seemed colder
+24:12
+it might have led to a goal sooner
+24:19
+say there's a goal
+24:20
+we never found that
+24:23
+because we never expanded in there
+24:26
+because we were so distracted by how hot
+24:28
+these states seemed
+24:30
+now if we
+24:31
+if we allow that
+24:33
+we're we're maybe prioritizing reaching
+24:35
+a goal even if it isn't the shortest
+24:37
+whereas if we set up our priorities
+24:39
+right we'll actually be exploring this
+24:41
+graph in layers
+24:44
+not necessarily in number of steps but
+24:46
+in cost layers so that we find this goal
+24:49
+first
+24:51
+so there's different algorithms these
+24:52
+are i'm
+24:54
+i'm
+24:55
+i've recognized that without writing
+24:57
+down more details this is fuzzy for you
+24:59
+right now but i'm trying to foreshadow
+25:02
+at a fuzzy level
+25:04
+that
+25:05
+your
+25:08
+structure of how you choose priority
+25:10
+here
+25:11
+is going to give
+25:13
+determine whether you have a guarantee
+25:14
+that you find the shortest path to the
+25:17
+goal first
+25:18
+or ever
+25:20
+and sometimes we don't care to focus on
+25:21
+that we just want to get to
+25:23
+any path to the goal
+25:31
+so given this general
+25:34
+structure for a search
+25:36
+we get two different breadth-first
+25:38
+methods
+25:39
+closely related based on how we choose
+25:42
+to
+25:43
+define priority in this repeated
+25:46
+expansion
+25:47
+so our choice of priority gives us these
+25:49
+two methods
+25:51
+the simplest thing is just to use
+25:53
+the oldest
+25:54
+unexpanded state as the one will expand
+25:57
+next so as we encounter states uh in
+26:00
+these
+26:01
+expansion we stick them in a queue
+26:04
+we use the first and first out queue so
+26:06
+the oldest one will come out first
+26:08
+and we repeatedly extract
+26:10
+a state from the queue and expand it
+26:13
+putting its successors into the queue
+26:17
+the places we can get by taking actions
+26:21
+so we do that over and over until we
+26:23
+find a goal
+26:25
+so this is going to explore
+26:28
+our state space in these layers for it
+26:31
+will first explore all of the states one
+26:33
+step from the initial state and then all
+26:35
+the states two steps from the initial
+26:37
+state and the order among these layers
+26:40
+within the layer is not defined here
+26:42
+because those would be ties
+26:44
+in the queue what's a tie in the queue
+26:46
+well we expand a node we get a bunch of
+26:48
+next states successors choices that we
+26:51
+had
+26:52
+in taking actions from that node or
+26:54
+state
+26:55
+and the sketched algorithm doesn't say
+26:58
+what order those go into the queue
+27:01
+they they're added at the same time
+27:04
+so it's unspecified
+27:08
+and to be noted that there's no role in
+27:09
+here for cost along these edges you can
+27:12
+imagine they're all the same cost if
+27:14
+there are costs we're ignoring them
+27:16
+so we're not going to find the lowest
+27:18
+cost solution it's going to find the
+27:19
+lowest number of steps if all the costs
+27:21
+are the same that will be a lowest cost
+27:23
+solution
+27:26
+so is this an effective method well the
+27:28
+first and first out queue is very
+27:30
+effective
+27:31
+we're basically spending a constant
+27:32
+amount of time on each
+27:35
+of the states in the state space that
+27:37
+we're going to encounter we're going to
+27:39
+take the time to notice it and stick it
+27:41
+in the queue we're going to take the
+27:42
+time to extract it from the queue this
+27:43
+takes a constant amount of time
+27:45
+then we expand it get its successors
+27:47
+constant amount of time stick them in
+27:48
+the queue
+27:50
+constant amount of time for each state
+27:53
+and edge so you know if one state was to
+27:55
+have a large number of successors you
+27:57
+could
+27:58
+imagine we have to do something per edge
+28:02
+but
+28:02
+this scales very nicely with the number
+28:04
+of states and edges the problem is
+28:07
+that in ai problems the space in which
+28:09
+we're searching
+28:11
+has an astronomical number of possible
+28:14
+states we're not going to want to
+28:15
+explore them all we're trying to focus
+28:17
+only on where we can get from the
+28:18
+initial state and
+28:20
+get to the goal as soon as possible and
+28:22
+not waste time on other parts of the
+28:23
+state space but this size v
+28:26
+just
+28:27
+restricted to what we encounter in that
+28:29
+process
+28:30
+is going to blow up exponentially
+28:33
+assuming we have a choice a branching
+28:35
+factor b
+28:37
+that gives the choice
+28:42
+the number of choices right b is the
+28:43
+number of choices that we see at each
+28:45
+node so
+28:46
+in this drawing it's it's one two three
+28:48
+four at the start state and two at the
+28:50
+others
+28:52
+so assuming we have a branching factor
+28:53
+that's not one then we're adding
+28:56
+b times as many states into the queue at
+28:59
+each layer as we did in the previous
+29:01
+layer and after d layers we have b to
+29:03
+the d states being put in
+29:06
+and so here we're imagining we must go
+29:08
+to d layers where d is the size of the
+29:11
+solution the smallest number of steps to
+29:13
+reach a goal
+29:15
+so this is exploding exponentially and
+29:17
+it's exploding exponentially in both
+29:19
+time and space we're remembering this
+29:20
+whole layer
+29:22
+in the fifo queue
+29:25
+so that whole layer is being remembered
+29:26
+and then we'll expand all the nodes as
+29:28
+we take them out and remember the next
+29:30
+whole layer which is
+29:31
+b times larger
+29:34
+so then the size of the fifo q is
+29:36
+growing exponentially and we're spending
+29:37
+all that time to remove the states from
+29:39
+it so it's both time and space
+29:41
+exponential in the depth of the solution
+29:46
+this can be viewed as an efficient
+29:48
+algorithm from a graph theoretic
+29:49
+perspective because it's
+29:51
+linear
+29:52
+in the size of the graph problem is an
+29:54
+ai that size is exponential
+29:59
+second breadth first method which
+30:01
+suffers the same sort of problem but is
+30:04
+going to use the costs
+30:06
+is a generalization of this
+30:08
+to where we have costs on the edges
+30:11
+and so we're going to use
+30:13
+as our priority the g function which
+30:15
+i'll remind you is the total cost
+30:18
+from the start state along the path that
+30:20
+we've used to the state we're putting in
+30:23
+the queue so if we're putting this state
+30:24
+here in the queue
+30:26
+this is the state s that's being put in
+30:28
+the queue
+30:30
+then
+30:32
+g of s is the sum of these two costs
+30:37
+if we discover s
+30:39
+along a different path
+30:41
+g of s will be the lesser of those two
+30:45
+paths costs
+30:48
+and so we're going to have in the queue
+30:50
+this fringe
+30:52
+of of states that we've considered but
+30:54
+not expanded
+30:58
+and take out the one with the lowest g
+31:00
+of s value
+31:02
+and expand that one now this is going to
+31:05
+explore this graph in a different sort
+31:06
+of layers where the layers have uniform
+31:09
+cost
+31:10
+now the drawing isn't perfect for this
+31:12
+because in order for this layer to have
+31:13
+uniform cost one of these edges would
+31:14
+have to have zero cost
+31:17
+which you can allow we definitely are
+31:19
+not allowing negative costs here
+31:21
+um that's not a cost at all but
+31:24
+but so we could have a zero cost and
+31:26
+these would both be in the same layer
+31:27
+but the drawing is really supposed to
+31:29
+indicate that that
+31:31
+this is an area of low cost where we can
+31:33
+get from the source in low cost whereas
+31:36
+to go across one of these edges out of
+31:38
+the layer
+31:39
+would for this drawing to be accurate
+31:40
+need to be one edge that's higher cost
+31:42
+than these two edges so we will have
+31:44
+explored this layer
+31:46
+within this red larger red circle we
+31:49
+will have explored this layer
+31:50
+before we cross this edge and expand
+31:53
+this
+31:55
+if
+31:56
+the idea is that these are low-cost
+31:57
+edges and this is a higher cost these
+31:59
+are higher cross edges
+32:01
+so we're going to be exploring it in
+32:04
+uniform cost layers this may actually be
+32:06
+two layers if the costs here aren't zero
+32:09
+because this has to be cheaper than this
+32:11
+so we might have a layer in between here
+32:13
+but the idea is to show the distortion
+32:16
+here it's not any longer like circles
+32:18
+around the
+32:19
+source it's distorted in the direction
+32:21
+of low cost
+32:23
+and that's going to enable it to find
+32:25
+the lowest cost solution first you can
+32:27
+show it's pretty easy to show in
+32:29
+analysis that
+32:31
+the nodes selected for expansion here
+32:33
+are increasing in g value
+32:36
+over time
+32:39
+so i've written that out for you the
+32:42
+states
+32:44
+as we've removed them one after the
+32:45
+other from the priority queue that's
+32:48
+managing the fringe
+32:50
+will be removed
+32:52
+in a non-decreasing g-value order we'll
+32:54
+never suddenly discover a short path
+32:58
+um
+32:59
+so say we we've removed this vertex this
+33:02
+is let's suppose this vertex is of all
+33:04
+the ones in this fringe here
+33:07
+around let's okay let me back up and set
+33:10
+my context
+33:11
+imagine that i've just completed this
+33:13
+layer the red
+33:14
+so
+33:15
+i have unexpanded fringe of these
+33:18
+states that are just across this layer
+33:20
+this one
+33:21
+this one this one on this one
+33:24
+these other ones haven't even gotten
+33:26
+into the fringe yet because i haven't
+33:27
+expanded these i've just completed the
+33:29
+two red layers
+33:30
+then i have four vertices in my priority
+33:33
+queue and one of them will have the
+33:35
+lowest g
+33:36
+value okay i'm going to expand that one
+33:41
+i can make an argument i'm not going to
+33:42
+do it here within the confines of this
+33:44
+course but it's not hard to argue that
+33:47
+i will never later expand some vertex
+33:50
+that finds a shorter
+33:52
+path to this vertex because of the way
+33:54
+i've constructed this any vertex i
+33:56
+expend later
+33:58
+will
+33:59
+if it discovers a path
+34:01
+to this vertex we'll have a higher cost
+34:03
+path
+34:04
+you can sort of see that right if i'm
+34:05
+expanding this one now at a certain g
+34:07
+value any other path to here has to come
+34:09
+through one of these other places and
+34:11
+they have higher g values already
+34:14
+so that path will be more expensive
+34:16
+we're finding the shortest path first
+34:19
+that's the point of uniform cost
+34:21
+okay
+34:24
+so states are removed in non-decreasing
+34:26
+order there could be ties but it's not
+34:28
+going to necessarily increase but it's
+34:30
+not going to decrease
+34:32
+okay this algorithm is actually also
+34:34
+called dijkstra's algorithm in the
+34:35
+algorithms community
+34:37
+people out there sometimes make a big
+34:39
+deal out of what are essentially trivial
+34:41
+differences between these algorithms
+34:43
+dijkstra's algorithm is usually viewed
+34:45
+as processing the entire graph and
+34:47
+finding the shortest path to every
+34:49
+state in the graph but that corresponds
+34:52
+to just
+34:52
+what if we don't have a goal we just
+34:54
+keep running this algorithm
+34:56
+we'll find the shortest cost to every
+34:58
+node in the
+35:00
+in the graph
+35:01
+in ai problems we don't imagine we can
+35:03
+do that the graph is too large so we're
+35:06
+going to stop when we reach a goal
+35:09
+that's the basic difference and it's not
+35:10
+really a difference at all so this is in
+35:12
+my view this is dijkstra's algorithm
+35:16
+the algorithm uses a priority queue
+35:19
+priority queue is a
+35:21
+queue where we don't take out the oldest
+35:23
+node we take out the lowest priority
+35:25
+queue and there are very efficient
+35:26
+methods for priority queues that you can
+35:28
+learn in algorithms classes
+35:31
+so so it's not quite as efficient as a
+35:33
+first and first out q it introduces a
+35:35
+log
+35:37
+term
+35:38
+so it's not constant effort per node
+35:40
+it's log of the number of nodes
+35:43
+effort per node but still very efficient
+35:45
+in terms of v and e
+35:48
+v being the number of states we're going
+35:50
+to explore and e being the number of
+35:51
+actions that edges between states we're
+35:54
+going to see as we explore so v is the
+35:56
+number of dots in this and e is the
+35:59
+number of lines or arrows and we're
+36:02
+going to be very efficient in terms of
+36:04
+vne not quite v plus e more like v log v
+36:08
+e log v
+36:09
+that sort of depends on how you
+36:11
+implement the priority queue
+36:13
+but very efficient but we still have the
+36:15
+problem that this is
+36:16
+an ai domain the number of vertices that
+36:19
+it states in the graph
+36:22
+is still
+36:23
+on the order that we're going to
+36:24
+actually encounter is on the order of b
+36:26
+to the d in fact if the costs happen to
+36:29
+all be one or all the same we are
+36:31
+executing breadth first search
+36:34
+it to generate to breadth first search
+36:36
+degenerate is perhaps too pejorative it
+36:39
+is breadth first search when the costs
+36:40
+are all won then we can just ignore the
+36:42
+costs
+36:45
+and as i've said this
+36:47
+use of bartique
+36:49
+allows us to find the lowest cost path
+36:52
+to a goal
+36:54
+that will be the first
+36:55
+with as soon as we see a goal in
+36:58
+uh
+36:59
+we don't even need to
+37:01
+well we have to uh wait until we remove
+37:03
+it from the priority queue but as soon
+37:04
+as we expand a goal
+37:06
+that's when we know we have the lowest
+37:08
+cost path
+37:13
+it does bear mentioning that
+37:16
+in this algorithm
+37:18
+because of the possible high variation
+37:20
+between high cost edges and low cost
+37:22
+edges the important moment when a goal
+37:24
+is found is when that goal is expanded
+37:33
+not when it's
+37:34
+initially found and stuck into the queue
+37:38
+because it might be later found again at
+37:40
+a lower cost before
+37:43
+it ever gets removed from the queue
+37:48
+so just to show that in our diagram we
+37:50
+can imagine this may be a very very
+37:53
+expensive edge so this is sitting in our
+37:55
+priority queue at a very high value
+38:00
+along the way we're expanding
+38:02
+we keep expanding this red circles that
+38:04
+never gets to include this but it's
+38:06
+including lots of other regions and one
+38:08
+of them has a very cheap much cheaper
+38:11
+pass to this vertex this vertex will get
+38:13
+in the queue again along that cheaper
+38:14
+path eventually
+38:17
+and that's the one that will get removed
+38:19
+and expanded
+38:22
+so that if this is a goal
+38:25
+we don't want to stop unless we're happy
+38:27
+to find any path of the goal if we want
+38:28
+to find the cheapest path of the goal we
+38:30
+got to keep going until we remove it and
+38:31
+expand it or we might find some other
+38:33
+goal at a cheaper cost
+38:36
+later
+38:37
+all right so
+38:39
+it finds the lowest cost path of the
+38:40
+goal
+38:42
+at expansion time
+38:44
+when the goal is expanded
+38:48
+and so i've written that out for you
+38:51
+all right so that's it for our coverage
+38:53
+of
+38:54
+breadth first uninformed methods
+38:57
+we'll later return to breadth first
+38:58
+methods with
+39:02
+information added in the form of like
+39:04
+estimates of how far away the goal is
+39:07
+we're also going to be talking a little
+39:09
+bit about how we could avoid
+39:11
+this
+39:12
+time and space
+39:16
+we can't avoid the time but how we can
+39:17
+avoid the space burden of an exponential
+39:20
+and
+39:21
+make that space-time trade-off i
+39:22
+referred to earlier in this lecture
+39:25
+so we'll get more detail on that

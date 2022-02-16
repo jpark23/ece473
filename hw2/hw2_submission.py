@@ -22,10 +22,13 @@ def lcs_length(s: str, t: str, i: int, j: int) -> int:
         Your equation can condition on the comparison between the last characters of the strings.
 
     """
-
-    # BEGIN_YOUR_CODE (our solution is 6 lines of code, but don't worry if you deviate from this)
-    raise Exception("Not implemented yet")
-    # END_YOUR_CODE
+    if(i <= 0 or j <= 0):
+        return 0
+    if(s[i-1] == t[j-1]):
+        return lcs_length(s, t, i-1, j-1) + 1
+    length2 = lcs_length(s, t, i-1, j)
+    length3 = lcs_length(s, t, i, j-1)
+    return max(length2, length3)
 
 
 ############################################################
@@ -38,9 +41,25 @@ def lcs_length_dp(s: str, t: str, i: int, j: int, table=None) -> int:
           If no table is provided, create one of appropriate size for s[0:i] and t[0:j] and pass that one into recursive calls.
     """
 
-    # BEGIN_YOUR_CODE (our solution is 10 lines of code, but don't worry if you deviate from this)
-    raise Exception("Not implemented yet")
-    # END_YOUR_CODE
+    if not table:
+        table = [[0 for x in range(i+1)] for y in range(j+1)]
+    
+    # base case, reached the empty string
+    if not i or not j:
+        return 0
+    
+    # if already visited
+    if table[i-1][j-1]:
+        return table[i-1][j-1]
+    
+    if(s[i-1] == t[j-1]):
+        table[i-1][j-1] = lcs_length_dp(s, t, i-1, j-1, table) + 1
+        return table[i-1][j-1]
+    
+    length2 = lcs_length_dp(s, t, i-1, j, table)
+    length3 = lcs_length_dp(s, t, i, j-1, table)
+    table[i-1][j-1] = max(length2, length3)
+    return table[i-1][j-1]
 
 
 ############################################################

@@ -1,0 +1,76 @@
+\documentclass[letterpaper,12pt]{article}
+\usepackage{amsmath, geometry}
+\usepackage[shortlabels]{enumitem}
+
+\geometry{left=1in, right=1in, top=1in, bottom=1in}
+
+\title{ECE 473 Homework 3}
+\date{January 27, 2022}
+\author{Jason Park (park1036)}
+
+\begin{document}
+\maketitle
+
+% question 1
+\begin{enumerate}
+\item Write loss function:
+$$Loss=(\sigma(\vec{w}\phi{(x)}-y)^2$$
+%-------------------------------------
+
+% question 2
+\item Compute gradient of the loss function with respect to $\vec{w}$
+$$p = \sigma(\vec{w}\phi(x))$$
+\begin{enumerate}
+\item$\bigtriangledown_{\vec(w)} = 2(\sigma(\vec(w)\phi(x)-y)\sigma'(\vec(w)\phi(x))\phi(x)\newline=2\phi(x)\sigma(\vec(w)\phi(x)-y)\sigma'(\vec(w)\phi(x))$
+\item$\sigma(z) = (1+e^{-z})^{-1}$
+\item$1+e^{-z} = \sigma^{-1}(z)$
+\item$e^{-z} = \sigma^{-1}(z) - 1$
+\item$\sigma'(z) = -1(1+e^{-z})^{-2}(-e^{-z})\newline= \sigma^{2}(z)e^{-z}\newline=\sigma^{2}(z)(\sigma^{-1}(z) - 1)$
+\item$\sigma'(z) = \sigma(z) - \sigma^{2}(z)$
+\item$\bigtriangledown_{\vec(w)}=2\phi(x)(p-y)(p-p^{2})$
+\newline
+$=-2\phi(x)p(p-y)(p-1)$
+\end{enumerate}
+%-------------------------------------
+
+% question 3
+\item To make $\bigtriangledown_{\vec(w)}=-2\phi(x)p(p-y)^{2}$ arbitrarily small, and given $\sigma(z) = (1+e^{-z})^{-1}$, the value of $\vec{w}$ would have to approach $-\infty$. The magnitude can never be 0.
+%-------------------------------------
+
+% question 4
+\item Find largest magnitude that gradient can take:
+\begin{enumerate}
+    \item $\bigtriangledown_{\vec(w)}=-2\phi(x)p(p-y)^{2}$
+    $=-2\phi(x)p(p^{2}-2p+1)$
+    $=-2\phi(x)(p^{3}-2p^{2}+p)$
+    \item $(\frac{d}{dp})(-2\phi(x))(p^{3}-2p^{2}+p)=-2\phi(x)(3p^{2}-4p+1)=-2\phi(x)(3p-1)(p-1)$
+    \item Largest Magnitude can occur @ $p=\frac{1}{3}$ or $p=1$
+    \item Plugging in $p=\frac{1}{3}$ and $p=1$ into $||-2\phi(x)p(p-y)^{2}||$
+    \newline
+    $p=\frac{1}{3}: \phi(x)(\frac{8}{27}) = (\frac{8}{27})\phi(x)$
+    \newline
+    $p=1: \phi(x)(0) = 0$
+    \item Since, the largest magnitude can occur @ $p=\frac{1}{3}$ or $p=1$, and when $p=1$ the magnitude is 0, the largest magnitude is $(\frac{8}{27})\phi(x)$, occurring at $p=\frac{1}{3}$.
+\end{enumerate}
+%-------------------------------------
+
+% question 5
+\item Show that there is an easy transformation to a modified data set D' of (x, y') pairs such that performing least squares regression (using a linear predictor and the squared loss) on D' converges to a vector w∗ that yields zero loss on D'
+\begin{enumerate}
+    \item $Loss_D = (\sigma(\vec{w}\phi(x)) - y)^{2}$
+    \newline $Loss_{D'} = (\vec{w}\phi(x) - y')^{2}$
+    \item $\sigma(\vec{w}\phi(x)) - y = 0$
+    \item $\vec{w}'\phi(x) - y' = 0$
+    \item $y = \sigma(\vec{w}\phi(x))$
+    \item $y' = \vec{w}'\phi(x)$
+    \item $\sigma^{-1}(\sigma(\vec{w}\phi(x))) = \sigma^{-1}(y)$
+    \item $\sigma^{-1}(\vec{w'}\phi(x)) = \sigma^{-1}(y')$
+    \item $\vec{w}'\phi(x) = y' = \sigma^{-1}(y)$
+\end{enumerate}
+%-------------------------------------
+
+% question 6
+
+%-------------------------------------
+\end{enumerate}
+\end{document}
