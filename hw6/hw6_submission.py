@@ -1,3 +1,4 @@
+from tracemalloc import start
 import shell
 import util
 import wordsegUtil
@@ -30,7 +31,6 @@ class SegmentationProblem(util.SearchProblem):
             cost = self.unigramCost(string)
             current_state += 1
             expansions.append((string, current_state, cost))
-
         return expansions
         # END_YOUR_CODE
 
@@ -49,28 +49,44 @@ def segmentWords(query, unigramCost):
 
 class VowelInsertionProblem(util.SearchProblem):
     def __init__(self, queryWords, bigramCost, possibleFills):
-        self.queryWords = queryWords
+        self.queryWords = queryWords # list of words
         self.bigramCost = bigramCost
         self.possibleFills = possibleFills
 
     def start(self):
         # BEGIN_YOUR_CODE (our solution is 1 line of code, but don't worry if you deviate from this)
-        raise Exception("Not implemented yet")
+        return wordsegUtil.SENTENCE_BEGIN
         # END_YOUR_CODE
 
     def goalp(self, state):
         # BEGIN_YOUR_CODE (our solution is 1 line of code, but don't worry if you deviate from this)
-        raise Exception("Not implemented yet")
+        return state == len(self.queryWords)
         # END_YOUR_CODE
 
     def expand(self, state):
+        print(str(self.queryWords)+" "+str(state))
         # BEGIN_YOUR_CODE (our solution is 6 lines of code, but don't worry if you deviate from this)
-        raise Exception("Not implemented yet")
+        if state == "-BEGIN-":
+            fills = self.possibleFills(self.queryWords[0])
+            if not fills: fills = [self.queryWords[0]]
+            expansions = [(fill, 0, self.bigramCost("-BEGIN-", fill)) for fill in fills] 
+        else:
+            expansions = []
+            for index, not_word in enumerate(self.queryWords[state:]):
+                fills1 = self.possibleFills(not_word)
+                fills2 = self.possibleFills(self.queryWords[index+state+1])
+                for fill1 in fills1:
+                    for fill2 in fills2:
+                        expansions.append((fill2, state+1, self.bigramCost(fill1, fill2)))
+        return expansions
         # END_YOUR_CODE
 
 def insertVowels(queryWords, bigramCost, possibleFills):
     # BEGIN_YOUR_CODE (our solution is 3 lines of code, but don't worry if you deviate from this)
-    raise Exception("Not implemented yet")
+    if len(queryWords) == 0: return ""
+    ucs = util.UniformCostSearch(verbose=0)
+    ucs.solve(VowelInsertionProblem(queryWords, bigramCost, possibleFills))
+    return " ".join(ucs.actions)
     # END_YOUR_CODE
 
 ############################################################
