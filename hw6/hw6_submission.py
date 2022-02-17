@@ -55,21 +55,22 @@ class VowelInsertionProblem(util.SearchProblem):
 
     def start(self):
         # BEGIN_YOUR_CODE (our solution is 1 line of code, but don't worry if you deviate from this)
-        return wordsegUtil.SENTENCE_BEGIN
+        return (0, wordsegUtil.SENTENCE_BEGIN)
         # END_YOUR_CODE
 
     def goalp(self, state):
         # BEGIN_YOUR_CODE (our solution is 1 line of code, but don't worry if you deviate from this)
-        return state == len(self.queryWords)
+        return state[0] == len(self.queryWords)
         # END_YOUR_CODE
 
     def expand(self, state):
-        print(str(self.queryWords)+" "+str(state))
+        # print(str(self.queryWords)+" "+str(state))
         # BEGIN_YOUR_CODE (our solution is 6 lines of code, but don't worry if you deviate from this)
         if state == "-BEGIN-":
             fills = self.possibleFills(self.queryWords[0])
             if not fills: fills = [self.queryWords[0]]
             expansions = [(fill, 0, self.bigramCost("-BEGIN-", fill)) for fill in fills] 
+        # elif end of queryWords
         else:
             expansions = []
             for index, not_word in enumerate(self.queryWords[state:]):
@@ -100,17 +101,19 @@ class JointSegmentationInsertionProblem(util.SearchProblem):
 
     def start(self):
         # BEGIN_YOUR_CODE (our solution is 1 line of code, but don't worry if you deviate from this)
-        raise Exception("Not implemented yet")
+        return (0, wordsegUtil.SENTENCE_BEGIN)
         # END_YOUR_CODE
 
     def goalp(self, state):
         # BEGIN_YOUR_CODE (our solution is 1 line of code, but don't worry if you deviate from this)
-        raise Exception("Not implemented yet")
+        return state[0] == len(self.query)
         # END_YOUR_CODE
 
     def expand(self, state):
         # BEGIN_YOUR_CODE (our solution is 5 lines of code, but don't worry if you deviate from this)
         raise Exception("Not implemented yet")
+        # 2 loops, for every space added, think of every vowel instance of that space, put that combo into the cost function
+
         # END_YOUR_CODE
 
 def segmentAndInsert(query, bigramCost, possibleFills):
