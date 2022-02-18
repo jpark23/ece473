@@ -108,17 +108,16 @@ class JointSegmentationInsertionProblem(util.SearchProblem):
         # BEGIN_YOUR_CODE (our solution is 5 lines of code, but don't worry if you deviate from this)
         # 2 loops, for every space added, think of every vowel instance of that space, put that combo into the cost function
         prev_word = state[0]
-        index = state[1]
+        current_index = state[1]
         expansions = []
         string = ""
-        while index < len(self.query):
-            string += self.query[index]
+        for letter in self.query[(current_index):]:
+            string += letter
             fills = self.possibleFills(string)
-            index += 1
-            if not fills: continue 
-            else:
-                for fill in fills: expansions.append( (fill, (fill, index), self.bigramCost(prev_word, fill)) )
-                break
+            current_index += 1
+            if fills:
+                for fill in fills:
+                    expansions.append( ( fill, (fill, current_index), self.bigramCost(prev_word, fill) ) )
         return expansions
         # END_YOUR_CODE
 
