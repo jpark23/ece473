@@ -146,7 +146,6 @@ def add_parts_2(grader, submission):
     def t_2b_1():
         def bigramCost(a, b):
             corpus = [wordsegUtil.SENTENCE_BEGIN] + 'beam me up scotty'.split()
-            # print(str(a)+" "+str(b))
             if (a, b) in list(zip(corpus, corpus[1:])):
                 return 1.0
             else:

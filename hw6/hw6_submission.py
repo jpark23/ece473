@@ -55,37 +55,31 @@ class VowelInsertionProblem(util.SearchProblem):
 
     def start(self):
         # BEGIN_YOUR_CODE (our solution is 1 line of code, but don't worry if you deviate from this)
-        return (0, wordsegUtil.SENTENCE_BEGIN)
+        return (wordsegUtil.SENTENCE_BEGIN, 0)
         # END_YOUR_CODE
 
     def goalp(self, state):
         # BEGIN_YOUR_CODE (our solution is 1 line of code, but don't worry if you deviate from this)
-        return state[0] == len(self.queryWords)
+        return state[1] == len(self.queryWords) 
         # END_YOUR_CODE
 
-    def expand(self, state):
-        # print(str(self.queryWords)+" "+str(state))
+    def expand(self, state): # state = (previous word, index of current word)
         # BEGIN_YOUR_CODE (our solution is 6 lines of code, but don't worry if you deviate from this)
-        if state == "-BEGIN-":
-            fills = self.possibleFills(self.queryWords[0])
-            if not fills: fills = [self.queryWords[0]]
-            expansions = [(fill, 0, self.bigramCost("-BEGIN-", fill)) for fill in fills] 
-        # elif end of queryWords
-        else:
-            expansions = []
-            for index, not_word in enumerate(self.queryWords[state:]):
-                fills1 = self.possibleFills(not_word)
-                fills2 = self.possibleFills(self.queryWords[index+state+1])
-                for fill1 in fills1:
-                    for fill2 in fills2:
-                        expansions.append((fill2, state+1, self.bigramCost(fill1, fill2)))
+        prev_word = state[0]
+        current_index = state[1]
+        current_word = self.queryWords[current_index]
+        expansions = []
+        fills = self.possibleFills( current_word )
+        if not fills: return [ (current_word, (current_word, current_index+1), self.bigramCost(prev_word, current_word)) ]
+        for fill in fills:
+            expansions.append( ( fill, (fill, current_index+1), self.bigramCost(prev_word, fill) ) )
         return expansions
         # END_YOUR_CODE
 
 def insertVowels(queryWords, bigramCost, possibleFills):
     # BEGIN_YOUR_CODE (our solution is 3 lines of code, but don't worry if you deviate from this)
     if len(queryWords) == 0: return ""
-    ucs = util.UniformCostSearch(verbose=0)
+    ucs = util.UniformCostSearch(verbose=2)
     ucs.solve(VowelInsertionProblem(queryWords, bigramCost, possibleFills))
     return " ".join(ucs.actions)
     # END_YOUR_CODE
