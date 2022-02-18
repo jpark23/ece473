@@ -1,4 +1,5 @@
 from tracemalloc import start
+from pyrsistent import b
 import shell
 import util
 import wordsegUtil
@@ -79,7 +80,7 @@ class VowelInsertionProblem(util.SearchProblem):
 def insertVowels(queryWords, bigramCost, possibleFills):
     # BEGIN_YOUR_CODE (our solution is 3 lines of code, but don't worry if you deviate from this)
     if len(queryWords) == 0: return ""
-    ucs = util.UniformCostSearch(verbose=2)
+    ucs = util.UniformCostSearch(verbose=0)
     ucs.solve(VowelInsertionProblem(queryWords, bigramCost, possibleFills))
     return " ".join(ucs.actions)
     # END_YOUR_CODE
@@ -95,7 +96,7 @@ class JointSegmentationInsertionProblem(util.SearchProblem):
 
     def start(self):
         # BEGIN_YOUR_CODE (our solution is 1 line of code, but don't worry if you deviate from this)
-        return (0, wordsegUtil.SENTENCE_BEGIN)
+        return (wordsegUtil.SENTENCE_BEGIN, 0)
         # END_YOUR_CODE
 
     def goalp(self, state):
@@ -105,9 +106,20 @@ class JointSegmentationInsertionProblem(util.SearchProblem):
 
     def expand(self, state):
         # BEGIN_YOUR_CODE (our solution is 5 lines of code, but don't worry if you deviate from this)
-        raise Exception("Not implemented yet")
         # 2 loops, for every space added, think of every vowel instance of that space, put that combo into the cost function
-
+        prev_word = state[0]
+        index = state[1]
+        expansions = []
+        string = ""
+        while index < len(self.query):
+            string += self.query[index]
+            fills = self.possibleFills(string)
+            index += 1
+            if not fills: continue 
+            else:
+                for fill in fills: expansions.append( (fill, (fill, index), self.bigramCost(prev_word, fill)) )
+                break
+        return expansions
         # END_YOUR_CODE
 
 def segmentAndInsert(query, bigramCost, possibleFills):
@@ -115,7 +127,11 @@ def segmentAndInsert(query, bigramCost, possibleFills):
         return ''
 
     # BEGIN_YOUR_CODE (our solution is 3 lines of code, but don't worry if you deviate from this)
-    raise Exception("Not implemented yet")
+    if len(query) == 0: return ""
+    ucs = util.UniformCostSearch(verbose=0)
+    ucs.solve(JointSegmentationInsertionProblem(query, bigramCost, possibleFills))
+    print(ucs.actions)
+    return " ".join(ucs.actions)
     # END_YOUR_CODE
 
 ############################################################
