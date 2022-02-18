@@ -101,7 +101,7 @@ class JointSegmentationInsertionProblem(util.SearchProblem):
 
     def goalp(self, state):
         # BEGIN_YOUR_CODE (our solution is 1 line of code, but don't worry if you deviate from this)
-        return state[0] == len(self.query)
+        return state[1] == len(self.query)
         # END_YOUR_CODE
 
     def expand(self, state):
@@ -129,7 +129,6 @@ def segmentAndInsert(query, bigramCost, possibleFills):
     if len(query) == 0: return ""
     ucs = util.UniformCostSearch(verbose=0)
     ucs.solve(JointSegmentationInsertionProblem(query, bigramCost, possibleFills))
-    print(ucs.actions)
     return " ".join(ucs.actions)
     # END_YOUR_CODE
 
