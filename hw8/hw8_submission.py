@@ -261,6 +261,31 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
     """
 
     # BEGIN_YOUR_CODE (our solution is 17 lines of code, but don't worry if you deviate from this)
-    raise Exception('Not implemented yet')
+    def expectation_value(gameState, depth):
+      if gameState.isWin() or gameState.isLose() or not gameState.getLegalActions(self.index): return gameState.getScore(), null  
+      elif depth == 0: return self.evaluationFunction(gameState), null
+      else:
+        vals = list()
+        for potential_action in gameState.getLegalActions(self.index):
+          new_v, _ = max_value(gameState.generateSuccessor(self.index, potential_action), depth-1)
+          vals.append(new_v)
+          action = potential_action
+        assert(vals)
+        return (sum(vals)/len(vals)), action
+
+    def max_value(gameState, depth):
+      if gameState.isWin() or gameState.isLose() or not gameState.getLegalActions(self.index): return gameState.getScore(), null  
+      elif depth == 0: return self.evaluationFunction(gameState), null
+      else:
+        v = -INFINITY
+        for potential_action in gameState.getLegalActions(self.index):
+          new_v, _ = expectation_value(gameState.generateSuccessor(self.index, potential_action), depth)
+          if new_v > v: 
+            v = new_v
+            action = potential_action
+      return v, action   
+
+    _, action = max_value(gameState, self.depth)
+    return action
     # END_YOUR_CODE
 
