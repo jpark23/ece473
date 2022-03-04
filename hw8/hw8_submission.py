@@ -1,3 +1,6 @@
+from json.encoder import INFINITY
+
+from sqlalchemy import null
 from util import manhattanDistance
 from game import Directions
 import random, util
@@ -164,7 +167,35 @@ class MinimaxAgent(MultiAgentSearchAgent):
     """
 
     # BEGIN_YOUR_CODE (our solution is 17 lines of code, but don't worry if you deviate from this)
-    raise Exception('Not implemented yet')
+    # only pacman is running minimax -> agentIndex will always be 0
+
+    def min_value(gameState, depth):
+      if gameState.isWin() or gameState.isLose() or not gameState.getLegalActions(self.index): return gameState.getScore(), null  
+      elif depth == 0: return self.evaluationFunction(gameState), null
+      else:
+        v = +INFINITY
+        for potential_action in gameState.getLegalActions(self.index):
+          new_v, _ = max_value(gameState.generateSuccessor(self.index, potential_action), depth-1)
+          if new_v < v:
+            v = new_v
+            action = potential_action
+      return v, action
+
+    def max_value(gameState, depth):
+      if gameState.isWin() or gameState.isLose() or not gameState.getLegalActions(self.index): return gameState.getScore(), null  
+      elif depth == 0: return self.evaluationFunction(gameState), null
+      else:
+        v = -INFINITY
+        for potential_action in gameState.getLegalActions(self.index):
+          new_v, _ = min_value(gameState.generateSuccessor(self.index, potential_action), depth)
+          if new_v > v: 
+            v = new_v
+            action = potential_action
+      return v, action   
+
+    _, action = max_value(gameState, self.depth)
+    return action
+
     # END_YOUR_CODE
 
 ######################################################################################
@@ -181,7 +212,36 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
     """
 
     # BEGIN_YOUR_CODE (our solution is 32 lines of code, but don't worry if you deviate from this)
-    raise Exception('Not implemented yet')
+    def min_value(gameState, depth, alpha, beta):
+      if gameState.isWin() or gameState.isLose() or not gameState.getLegalActions(self.index): return gameState.getScore(), null  
+      elif depth == 0: return self.evaluationFunction(gameState), null
+      else:
+        v = +INFINITY
+        for potential_action in gameState.getLegalActions(self.index):
+          new_v, _ = max_value(gameState.generateSuccessor(self.index, potential_action), depth-1, alpha, beta)
+          if new_v < v:
+            v = new_v
+            action = potential_action
+            beta = min(beta, v)
+          if v <= alpha: return v, action
+      return v, action
+
+    def max_value(gameState, depth, alpha, beta):
+      if gameState.isWin() or gameState.isLose() or not gameState.getLegalActions(self.index): return gameState.getScore(), null  
+      elif depth == 0: return self.evaluationFunction(gameState), null
+      else:
+        v = -INFINITY
+        for potential_action in gameState.getLegalActions(self.index):
+          new_v, _ = min_value(gameState.generateSuccessor(self.index, potential_action), depth, alpha, beta)
+          if new_v > v: 
+            v = new_v
+            action = potential_action
+            alpha = max(alpha, v)
+          if v >= beta: return v, action
+      return v, action    
+
+    _, action = max_value(gameState, self.depth, -INFINITY, +INFINITY)
+    return action
     # END_YOUR_CODE
 
 ######################################################################################

@@ -3,7 +3,7 @@
 import graderUtil
 
 grader = graderUtil.Grader()
-submission = grader.load('hw6_submission')
+submission = grader.load('hw8_submission')
 
 FINAL_GRADE = True
 SEED = 'testing' # random seed at the beginning of each question for more fairness in grading...
