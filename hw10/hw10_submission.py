@@ -1,3 +1,5 @@
+from hashlib import new
+from sympy import N
 import util, math, random
 from collections import defaultdict
 from util import ValueIteration
@@ -47,7 +49,45 @@ class BlackjackMDP(util.MDP):
     #   don't include that state in the list returned by succAndProbReward.
     def succAndProbReward(self, state, action):
         # BEGIN_YOUR_CODE (our solution is 37 lines of code, but don't worry if you deviate from this)
-        raise NotImplementedError
+        # ( (totalCardValueinHand, nextCardIndexifPeeked, deckCardCounts), prob, reward )
+
+        if not state[2]: return [] # are we at a terminal state
+        
+        if action == 'Quit': return [( (state[0], None, None), 1, state[0] )]
+        elif action == 'Take':  
+            if sum(list(state[2])) == 1: empty = True 
+            else: empty = False
+            stateProbReward = []
+            for index, count in enumerate(state[2]):
+                if not count: continue
+                card_val = self.cardValues[index]
+                if card_val + state[0] > self.threshold:
+                    succState = (state[0]+card_val, None, None)
+                else:
+                    if empty: succState = (state[0]+card_val, None, None)
+                    else: 
+                        stateasList = list(state[2])
+                        stateasList[index] -= 1
+                        succState = (state[0]+card_val, None, tuple(stateasList))
+                probability = count / sum(state[2])
+                if empty: reward = state[0] + card_val
+                else: reward = 0
+                stateProbReward.append( (succState, probability, reward) )
+        elif action == 'Peek':
+            stateProbReward = []
+            for index, count in enumerate(state[2]):
+                if not count: continue
+                card_val = self.cardValues[index]
+                if card_val + state[0] > self.threshold:
+                    succState = (state[0], index, None)
+                else:
+                    succState = (state[0], index, state[2])
+                probability = count / sum(state[2])
+                reward = -1*self.peekCost
+                stateProbReward.append( (succState, probability, reward) )
+        else: assert 0, "Error Code: Sarah"
+
+        return stateProbReward
         # END_YOUR_CODE
 
     def discount(self):
