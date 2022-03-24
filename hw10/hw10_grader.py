@@ -11,7 +11,7 @@ submission = grader.load('hw10_submission')
 
 def test1a():
     mdp1 = submission.BlackjackMDP(cardValues=[1, 5], multiplicity=2,
-                                   threshold=10, peekCost=1)                
+                                   threshold=10, peekCost=1)
     startState = mdp1.startState()
     preBustState = (6, None, (1, 1))
     postBustState = (11, None, None)

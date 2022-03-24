@@ -51,38 +51,60 @@ class BlackjackMDP(util.MDP):
         # BEGIN_YOUR_CODE (our solution is 37 lines of code, but don't worry if you deviate from this)
         # ( (totalCardValueinHand, nextCardIndexifPeeked, deckCardCounts), prob, reward )
 
-        if not state[2]: return [] # are we at a terminal state
+        def bust(card_val, hand_val, threshold):
+            return card_val + hand_val > threshold
+        import copy
+
+        hand_value, peek_next_index, card_counts = state[0], state[1], state[2]
+        if not card_counts: return [] # are we at a terminal state
         
-        if action == 'Quit': return [( (state[0], None, None), 1, state[0] )]
+        if action == 'Quit': return [( (hand_value, None, None), 1, hand_value )]
         elif action == 'Take':  
-            if sum(list(state[2])) == 1: empty = True 
-            else: empty = False
             stateProbReward = []
-            for index, count in enumerate(state[2]):
-                if not count: continue
-                card_val = self.cardValues[index]
-                if card_val + state[0] > self.threshold:
-                    succState = (state[0]+card_val, None, None)
+            if peek_next_index is None: # normal take action, show all possible next states
+                if sum(list(card_counts)) == 1: empty = True
+                else: empty = False
+                for index, count in enumerate(card_counts):
+                    if not count: continue
+                    card_val = self.cardValues[index]
+                    if bust(card_val, hand_value, self.threshold): succState = ((card_val + hand_value), None, None)
+                    else:
+                        if empty: succState = (card_val+hand_value, None, None)
+                        else:
+                            card_count_list = list(copy.copy(card_counts))
+                            card_count_list[index] -= 1
+                            succState = (card_val+hand_value, None, tuple(card_count_list))
+                    probability = count / sum(card_counts)
+                    if empty: reward = hand_value + card_val
+                    else: reward = 0
+                    stateProbReward.append( (succState, probability, reward)  )
+            elif peek_next_index is not None: # we must take the card at peek_next_index
+                if sum(list(card_counts)) == 1: empty = True
+                else: empty = False
+                card_val = self.cardValues[peek_next_index]
+                if bust(card_val, hand_value, self.threshold): succState = ((card_val + hand_value), None, None)
                 else:
-                    if empty: succState = (state[0]+card_val, None, None)
-                    else: 
-                        stateasList = list(state[2])
-                        stateasList[index] -= 1
-                        succState = (state[0]+card_val, None, tuple(stateasList))
-                probability = count / sum(state[2])
-                if empty: reward = state[0] + card_val
+                    if empty: succState = (card_val+hand_value, None, None)
+                    else:
+                        card_count_list = list(copy.copy(card_counts))
+                        card_count_list[peek_next_index] -= 1
+                        succState = (card_val+hand_value, None, tuple(card_count_list))
+                probability = 1
+                if empty: reward = hand_value + card_val
                 else: reward = 0
-                stateProbReward.append( (succState, probability, reward) )
+                stateProbReward.append( (succState, probability, reward)  )
+            else: assert 0, "Error Code: Benjamin"
         elif action == 'Peek':
+            if peek_next_index is not None: return []
             stateProbReward = []
-            for index, count in enumerate(state[2]):
+            for index, count in enumerate(card_counts):
                 if not count: continue
-                card_val = self.cardValues[index]
-                if card_val + state[0] > self.threshold:
-                    succState = (state[0], index, None)
-                else:
-                    succState = (state[0], index, state[2])
-                probability = count / sum(state[2])
+                # card_val = self.cardValues[index]
+                # if card_val + state[0] > self.threshold:
+                #     succState = (state[0], index, None)
+                # else:
+                succState = (hand_value, index, card_counts)
+                probability = count / sum(card_counts)
                 reward = -1*self.peekCost
                 stateProbReward.append( (succState, probability, reward) )
         else: assert 0, "Error Code: Sarah"
@@ -102,7 +124,8 @@ def peekingMDP():
     optimal action at least 10% of the time.
     """
     # BEGIN_YOUR_CODE (our solution is 1 line of code, but don't worry if you deviate from this)
-    raise NotImplementedError
+    # change ONLY cardValues and multiplicity
+    return BlackjackMDP(cardValues=[1, 3, 17], multiplicity=20, threshold=20, peekCost=1)
     # END_YOUR_CODE
 
 ############################################################
