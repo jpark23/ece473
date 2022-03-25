@@ -99,10 +99,6 @@ class BlackjackMDP(util.MDP):
             stateProbReward = []
             for index, count in enumerate(card_counts):
                 if not count: continue
-                # card_val = self.cardValues[index]
-                # if card_val + state[0] > self.threshold:
-                #     succState = (state[0], index, None)
-                # else:
                 succState = (hand_value, index, card_counts)
                 probability = count / sum(card_counts)
                 reward = -1*self.peekCost
@@ -173,7 +169,44 @@ class QLearningAlgorithm(util.RLAlgorithm):
     # self.getQ() to compute the current estimate of the parameters.
     def incorporateFeedback(self, state, action, reward, newState):
         # BEGIN_YOUR_CODE (our solution is 8 lines of code, but don't worry if you deviate from this)
-        raise NotImplementedError
+        def attendance(cardCounts):
+            ''''Normalize card counts to 1 or 0'''
+            present = []
+            for count in cardCounts:
+                if not count: present.append(0)
+                else: present.append(1)
+            return present
+
+        eta = self.getStepSize()
+        q_opt= self.getQ(state, action)
+        if newState is not None: v_opt = max([self.getQ(newState, newAction) for newAction in self.actions(newState)])
+        else: v_opt = 0
+        c = eta * (q_opt - reward - self.discount * v_opt)
+        feature_dict = self.featureExtractor(state, action)
+
+        try:
+            featureKey = (state, action)
+            featureValue = feature_dict[featureKey]
+            newQ = q_opt - c * featureValue 
+            self.weights[featureKey] = newQ
+        except:
+            try:
+                featureKey = (state[0], action)
+                featureValue = feature_dict[featureKey]
+                newQ = q_opt - c * featureValue 
+                self.weights[featureKey] = newQ
+            except:
+                try:
+                    present = attendance(state[2])
+                    featureKey = (tuple(present), action)
+                    featureValue = feature_dict[featureKey]
+                    newQ = q_opt - c * featureValue 
+                    self.weights[featureKey] = newQ
+                except:
+                    # i'm not entirely sure how to handle the value ones
+                    assert 0, "Error Code: Jean Luc"
+
+
         # END_YOUR_CODE
 
 # Return a single-element dict containing a binary (indicator) feature
@@ -192,12 +225,29 @@ smallMDP = BlackjackMDP(cardValues=[1, 5], multiplicity=2, threshold=10, peekCos
 largeMDP = BlackjackMDP(cardValues=[1, 3, 5, 8, 10], multiplicity=3, threshold=40, peekCost=1)
 
 def simulate_QL_over_MDP(mdp, featureExtractor):
-    # NOTE: adding more code to this function is totally optional, but it will probably be useful
-    # to you as you work to answer question 2b (a written question on this assignment).  We suggest
-    # that you add a few lines of code here to run value iteration, simulate Q-learning on the MDP,
-    # and then print some stats comparing the policies learned by these two approaches.
+    '''NOTE: adding more code to this function is totally optional, but it will probably be useful
+    to you as you work to answer question 2b (a written question on this assignment).  We suggest
+    that you add a few lines of code here to run value iteration, simulate Q-learning on the MDP,
+    and then print some stats comparing the policies learned by these two approaches.'''
     # BEGIN_YOUR_CODE (our solution is 9 lines of code, but don't worry if you deviate from this)
-    pass
+    value_iteration = ValueIteration() 
+    value_iteration.solve(mdp)
+    # statesToValues = value_iteration.V
+    statesToActions = value_iteration.pi
+
+    rl = QLearningAlgorithm(mdp.actions, mdp.discount(), featureExtractor)
+    util.simulate(mdp, rl, numTrials=30000)
+    rl.explorationProb = 0
+
+    # but how do the policies compare? 
+    print("for how many states does value iteration produce a different action than q-learning?")
+    different = 0
+    possible = len(mdp.states)
+    for state in mdp.states:
+        vi_action = statesToActions[state]
+        q_action = rl.getAction(state)
+        if (vi_action is not q_action): different += 1
+    print(" - value iteration produced a different state", different, "times on", possible, "chances\n")
     # END_YOUR_CODE
 
 ############################################################
@@ -214,9 +264,22 @@ def simulate_QL_over_MDP(mdp, featureExtractor):
 #       Note: only add these features if the deck is not None.
 def blackjackFeatureExtractor(state, action):
     total, nextCard, counts = state
-
     # BEGIN_YOUR_CODE (our solution is 7 lines of code, but don't worry if you deviate from this)
-    raise NotImplementedError
+    featureDict = {}
+    # featureDict[((total, nextCard, counts)), action] = 1
+    featureDict[(total, action)] = 1
+    if counts is not None:
+        present = []
+        for value in counts: # but what if total is equal to value?
+            featureDict[(value, action)] = 1
+            if value: present.append(1)
+            elif not value: present.append(0)
+            else: assert 0, "Error Code: Autumn"
+        featureDict[(tuple(present), action)] = 1
+    # if counts is not None: 
+    #     assert len(featureDict.keys()) == (2 + len(counts)), "Error Code: Jeremy"
+    # else: assert len(featureDict.keys()) == 1, "Error Code: Melissa"
+    return featureDict
     # END_YOUR_CODE
 
 ############################################################
